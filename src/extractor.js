@@ -77,20 +77,24 @@ function generateCell(code, kind="python") {
 def _():
 ${code.split('\n').map(line => '    ' + line).join('\n')}
 `;
-}
-    if (kind === "md") {
+  }
+  if (kind === "md") {
     return `@app.cell(hide_code=True)
 def _():
     mo.md("""
 ${code.split('\n').map(line => '    ' + line).join('\n')}
     """)
 `;
-}
+  }
 }
 
 function generateNotebook(cells) {
+  // Check if any cells are markdown to determine if we need to import mo
+  const hasMarkdown = cells.some(cell => cell.includes('mo.md('));
+  const moImport = hasMarkdown ? 'import marimo as mo\n' : '';
+  
   return `import marimo
-
+${moImport}
 app = marimo.App()
 
 ${cells}
@@ -140,7 +144,20 @@ function createButton(codeElement, config = buttonSettings) {
   });
   button.addEventListener('click', function(e) {
     e.preventDefault();
-    const code = generateNotebook(generateCell(codeElement.textContent));
+    
+    // Detect language based on class names
+    const allClassNames = Array.from(codeElement.classList).concat(
+      Array.from(codeElement.getElementsByTagName("*")).flatMap(el => Array.from(el.classList))
+    );
+    
+    let kind = "python"; // default
+    if (allClassNames.includes("language-python")) {
+      kind = "python";
+    } else if (allClassNames.includes("language-md") || allClassNames.includes("language-markdown")) {
+      kind = "md";
+    }
+    
+    const code = generateNotebook(generateCell(codeElement.textContent, kind));
     const encodedCode = encodeURIComponent(code);
     const url = `${config.url}?${config.paramName}=${encodedCode}`;
     window.open(url, '_blank');
@@ -190,7 +207,14 @@ document.addEventListener("DOMContentLoaded", function() {
       const allClassNames = Array.from(element.classList).concat(
         Array.from(element.getElementsByTagName("*")).flatMap(el => Array.from(el.classList))
       );
-      const kind = allClassNames.includes("language-python") ? "python" : "md";
+      
+      // Detect language based on class names
+      let kind = "python"; // default
+      if (allClassNames.includes("language-python")) {
+        kind = "python";
+      } else if (allClassNames.includes("language-md") || allClassNames.includes("language-markdown")) {
+        kind = "md";
+      }
 
       return generateCell(element.textContent, kind);
     });

@@ -27,7 +27,7 @@ pages.
 try locally; [install `uv`](https://docs.astral.sh/uv/), then run
 
 ```bash
-uv run --with mkdocs-material mkdocs serve
+make serve
 ```
 
 
@@ -83,6 +83,41 @@ slider.value * "🍃"
 This will embed an iframe with an interactive slider. 
 
 ![iframe preview](img/slider.gif)
+
+### **Mixed Python and Markdown cells**
+
+You can combine Python and Markdown cells in the same notebook. Markdown cells are automatically detected and rendered as documentation:
+
+````md
+<div>
+<marimo-iframe>
+```md
+# Markdown snippet example
+## Imports
+```
+```python
+import marimo as mo
+```
+```md
+## Setup slider in UI and display it
+```
+```python
+slider = mo.ui.slider(1, 10)
+slider
+```
+```md
+## This title is in Markdown and below is displaying value of 🍃 based on the slider
+```
+```python
+slider.value * "🍃"
+```
+</marimo-iframe>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@marimo-team/marimo-snippets@1"></script>
+````
+
+This creates a notebook with alternating markdown documentation and Python code cells. Markdown cells are automatically imported as `marimo as mo` when needed.
 
 > [!NOTE]  
 > You might wonder why we wrap the `<marimo-button>` element with an extra

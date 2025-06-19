@@ -1,8 +1,8 @@
 {
   "name": "@marimo-team/marimo-snippets",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "files": [
-    "src/exctractor.js"
+    "src/extractor.js"
   ],
   "publishConfig": {
     "access": "public"
